@@ -69,15 +69,25 @@ export function initialize(): void {
         let spoilerToggled = false;
 
         const selection = document.getSelection();
+        // If there's a text selection, defer spoiler toggling until the selection is cleared
         if (selection && selection.type === "Range") {
+            let selectionCleared = false;
+
+            // On mouseup, check if the selection has been cleared
             $(document).one("mouseup", () => {
                 const newSelection = document.getSelection();
                 if (!newSelection || newSelection.type !== "Range") {
-                    // If the selection is cleared after the mouseup, we toggle the spoiler
-                    toggle_spoiler($spoiler_content, $button, $arrow);
-                    spoilerToggled = true;
+                    selectionCleared = true;
                 }
             });
+
+            // On the next click, toggle spoiler only if the selection has been cleared
+            $(document).one("click", () => {
+                if (selectionCleared) {
+                    toggle_spoiler($spoiler_content, $button, $arrow);
+                }
+            });
+
             return;
         }
 
